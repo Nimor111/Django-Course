@@ -14,6 +14,7 @@ def create_user_view(_):
     data = {'identifier': identifier}
     return JsonResponse(data, json_dumps_params={'indent': 4})
 
+
 @csrf_exempt
 def write_key_view(request, useridentifier):
     if request.method == 'POST':
@@ -54,6 +55,7 @@ def get_key_view(request, useridentifier, key):
         return JsonResponse({"error": "Key not found."},
                             json_dumps_params={'indent': 4},
                             status=404)
+
 
 @csrf_exempt
 def delete_key_view(request, useridentifier, key):
