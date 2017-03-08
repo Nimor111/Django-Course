@@ -14,27 +14,51 @@ def create_user():
 
 
 def write_key(identifier, key, value):
-    data = Data.objects.create(key=key, value=value)
-    data.user = User.objects.get(id=identifier)
-    if data:
-        data.save()
-    else:
+    try:
+        user = User.objects.get(pk=identifier)
+    except Exception:
         raise ValueError
+    data = Data.objects.create(key=key, value=value)
+    user.key = data
+    user.save()
+    data.save()
     return data
 
 
 def get_key(identifier, key):
-    data = Data.objects.get(key=key, user=User.objects.get(id=identifier))
-    if not data:
+    try:
+        user = User.objects.get(pk=identifier)
+    except Exception:
         raise ValueError
 
-    return {"value": data.value}
+    try:
+        key_data = Data.objects.filter(key=key)
+        for d in key_data:
+            if user in d.user_set.all():
+                key_data = d
+        if not isinstance(key_data, Data):
+            raise ValueError
+    except Exception:
+        raise KeyError
+
+    return {"value": key_data.value}
 
 
 def delete_key(identifier, key):
-    data = Data.objects.get(key=key, user=User.objects.get(id=identifier))
-    if not data:
+    try:
+        user = User.objects.get(id=identifier)
+    except Exception:
         raise ValueError
+    try:
+        key_data = Data.objects.filter(key=key)
+        for d in key_data:
+            if user in d.user_set.all():
+                key_data = d
+        if not isinstance(key_data, Data):
+            raise ValueError
 
-    data.delete()
-    return data
+        key_data.delete()
+    except Exception:
+        raise KeyError
+
+    return key_data
