@@ -41,12 +41,10 @@ def get_key_view(_, identifier, key):
         data = get_key(identifier, key)
         return JsonResponse(data, json_dumps_params={'indent': 4}, status=200)
     except KeyError:
-        print("KEYERROR")
         return JsonResponse({"error": "Key not found."},
                             json_dumps_params={'indent': 4},
                             status=404)
     except ValueError:
-        print("VALUERROR")
         return JsonResponse({"error": "Key not found."},
                             json_dumps_params={'indent': 4},
                             status=404)
@@ -58,10 +56,8 @@ def delete_key_view(_, identifier, key):
         data = delete_key(identifier, key)
         return JsonResponse({'status': 'deleted'}, status=202)
     except KeyError:
-        print("DELKEYERROR")
         return JsonResponse({'error': 'key'}, status=404)
     except ValueError:
-        print("DELVALUERROR")
         return JsonResponse({"error": "Key not found."},
                             json_dumps_params={'indent': 4},
                             status=404)
