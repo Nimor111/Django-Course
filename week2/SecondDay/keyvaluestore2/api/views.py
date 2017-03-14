@@ -85,7 +85,6 @@ def index_view(request):
 def user_detail_view(request, user_id):
     user = get_object_or_404(User, pk=user_id)
 
-    # import ipdb; ipdb.set_trace()
     data = user.data_set.all()
 
     return render(request, 'user_detail.html', locals())

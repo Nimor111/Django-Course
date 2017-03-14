@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index_view, name='index'),
     url(r'^user-detail/(?P<user_id>{})/$'.format(uuid_regex),
-        views.user_detail_view, name='user_detail'),
+        views.user_detail_view, name='user-detail'),
     url(r'^add-key/(?P<user_id>{})/$'.format(uuid_regex),
         views.add_key_view, name='add_key'),
 ]
