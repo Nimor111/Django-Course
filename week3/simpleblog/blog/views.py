@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 
 from .models import BlogPost, Tag, Comment
+from .forms import BlogPostForm
 
 
 # Create your views here.
@@ -27,21 +29,10 @@ def post_detail_view(request, pk):
 
 
 def add_post_view(request):
+    form = BlogPostForm()
     if request.method == 'POST':
-        # import ipdb; ipdb.set_trace()
-        title = request.POST.get('title')
-        content = request.POST.get('content')
-        tags = request.POST.get('tags').split(',')
-
-        b = BlogPost.objects.create(title=title, content=content)
-
-        for tag in tags:
-            if not Tag.objects.filter(name=tag):
-                t = Tag.objects.create(name=tag)
-                b.tags.add(t)
-            else:
-                b.tags.add(Tag.objects.get(name=tag))
-
-        b.save()
-
+        form = BlogPostForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('blog:index_view'))
     return render(request, 'add_post.html', locals())

@@ -3,23 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <style>
-        #textarea
-        {
-            height: 200px;
-        }
-    </style>
 </head>
 <body>
     <form method="POST" action="">
         {% csrf_token %}
-        <label>Title</label>
-        <input type="text" name="title" /><br>
-        <label>Content</label>
-        <textarea rows='5' cols='30' name="content"></textarea><br>
-        <label>Tags</label>
-        <input type="text" name="tags" />
-        <input type="submit" value="Go!" />
+        {{ form.as_p }}
+       <input type="submit" value="Go!" />
     </form>
 </body>
 </html>
