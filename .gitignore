@@ -2,3 +2,5 @@ venv
 *.pyc
 .env
 bower_components
+node_modules
+.buildpacks
