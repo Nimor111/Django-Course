@@ -1,1 +1,1 @@
-web: python fullblog/manage.py collectstatic --noinput; gunicorn fullblog.wsgi --log-file -
+web: gunicorn fullblog.wsgi --log-file -
