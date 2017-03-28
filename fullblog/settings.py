@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'website',
     'blog',
+    'djangobower',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,17 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+STATICFILES_FINDERS = [
+    'djangobower.finders.BowerFinder',
+]
+
+BOWER_COMPONENTS_ROOT = '/home/gbojinov/FullBlog/bower_components/'
+
+BOWER_INSTALLED_APPS = (
+    'bootstrap',
+    'font-awesome',
+    'jquery',
+    'magnific-popup',
+    'owl-carousel'
+)
