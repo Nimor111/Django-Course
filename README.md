@@ -1,2 +1,0 @@
-# FullBlog
-Heroku stuff
