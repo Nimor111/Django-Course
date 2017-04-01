@@ -1,7 +1,12 @@
 venv
 *.pyc
 .env
+proto_db
 bower_components
 node_modules
 .buildpacks
 staticfiles
+__pycache__
+Procfile
+runtime.txt
+week5

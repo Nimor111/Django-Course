@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>User count</th>
+                <th>Keys count</th>
+                <th>Histogram</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>{{ users_count }}</th>
+                <th>{{ keys_count }}</th>
+                <th>{{ histogram }}</th>
+            </tr>
+        </tbody>
+    </table>
+
+    <table border=2px>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Created at</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <th><a href="{% url 'user-detail' user.id %}">{{ user.id }}</a></th>
+                    <th>{{ user.created_at }}</th>
+                </tr>  
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
