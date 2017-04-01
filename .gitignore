@@ -1,12 +1,10 @@
 venv
+__pycache__
 *.pyc
-.env
 proto_db
 bower_components
-node_modules
-.buildpacks
 staticfiles
-__pycache__
+.env
 Procfile
 runtime.txt
-week5
+Loki_Stuff

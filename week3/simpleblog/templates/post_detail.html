@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load blog_extras %}
+    <title></title>
+</head>
+<body>
+    {% if post %}
+        {% autoescape off %}
+            {{ post.content|markdown }}
+        {% endautoescape %}
+        <h2>Tags</h2>
+        {% for tag in tags %}
+            {% autoescape off %}
+                {{ tag.name|markdown }}
+            {% endautoescape %}
+        {% endfor %}
+        {% if comments %}
+            <h2>Comments</h2> 
+            {% for comment in comments %}
+                {% autoescape off %}
+                    {{ comment.email|markdown }}
+                    {{ comment.content|markdown }}
+                {% endautoescape %}
+            {% endfor %}
+        {% endif %}
+        <h2>Post a comment!</h2>
+        {% include 'add_comment.html' %}
+    {% endif %}
+</body>
+</html>
