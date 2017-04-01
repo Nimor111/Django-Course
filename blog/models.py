@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from .query import BlogPostQuerySet
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
@@ -17,6 +19,7 @@ class BlogPost(models.Model):
     content = models.TextField(default='content')
     tags = models.ManyToManyField(Tag)
     authors = models.ManyToManyField(User, related_name='posts')
+    is_private = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
@@ -25,6 +28,8 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.title
+
+    objects = BlogPostQuerySet.as_manager()
 
 
 class Comment(models.Model):

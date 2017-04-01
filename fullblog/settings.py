@@ -73,6 +73,10 @@ DATABASES = {
         'USER': 'fullbloguser',
         'PASSWORD': 'password',
         'HOST': 'localhost',
+        'TEST': {
+            'NAME': 'test_fullblog',
+            'USER': 'fullbloguser',
+        },
         'PORT': '',
     }
 }

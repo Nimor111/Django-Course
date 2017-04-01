@@ -66,7 +66,7 @@
 
 					<!--LOGO-->
 					<div id="logo">
-						<a href="index.html" class="logo" data-dark-logo="{% static 'website/images/logo-dark.png' %}"> <img src="{% static 'website/images/logo.png' %}" alt="Polo Logo"> </a>
+                                            <a href="{% url 'blog:index' %}" class="logo" data-dark-logo="{% static 'website/images/logo-dark.png' %}"> <img src="{% static 'website/images/logo.png' %}" alt="Polo Logo"> </a>
 					</div>
 					<!--END: LOGO-->
 
@@ -166,7 +166,7 @@
 		<div class="row">
 			<!-- Blog post-->
 			<div class="post-content post-thumbnail col-md-9">
-				{% for post in posts %}
+                                {% for post in posts %}
 				<!-- Blog image post-->
 				<div class="post-item">
 					<div class="post-image">
@@ -213,7 +213,6 @@
 					</div>
 				</div>
 				{% endfor %}
-
 			</div>
 
 			<!-- Sidebar-->
