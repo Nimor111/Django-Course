@@ -5,8 +5,6 @@ from .models import Category, Offer
 
 from faker import Factory
 
-from django.contrib.auth.models import User
-
 faker = Factory.create()
 
 
