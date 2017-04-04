@@ -1,9 +1,9 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from .factories import TagFactory, BlogPostFactory
+from blog.factories import TagFactory, BlogPostFactory
 
 from django.urls import reverse
-from .models import BlogPost
+from blog.models import BlogPost
 from faker import Factory
 
 
@@ -54,7 +54,7 @@ class IndexViewTests(TestCase):
         self.assertContains(response, self.tag.name)
 
 
-class BlogPostCreateTests(TestCase):
+class CreateBlogViewTests(TestCase):
 
     def setUp(self):
         self.tag = TagFactory()
@@ -62,5 +62,20 @@ class BlogPostCreateTests(TestCase):
         self.blog_post = BlogPostFactory()
         self.user = User.objects.create_user(username=faker.name(), password='pesho')
 
-    def test_create_blog_post_works_correctly(self):
-        pass
+    def test_post_request_when_not_logged_in_is_invalid(self):
+        self.assertEqual(BlogPost.objects.count(), 1)
+        url = reverse('blog:create')
+        response = self.client.post(url, data={'title': faker.name(), 'content': faker.text()})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(BlogPost.objects.count(), 1)
+
+    def test_post_request_when_logged_in_is_valid(self):
+        self.client.login(username=self.user.username, password='pesho')
+        self.assertEqual(BlogPost.objects.count(), 1)
+        url = reverse('blog:create')
+        response = self.client.post(url, data={'title': faker.name(), 'content': faker.text()})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(BlogPost.objects.count(), 2)
+
+    def tearDown(self):
+        self.client.logout()

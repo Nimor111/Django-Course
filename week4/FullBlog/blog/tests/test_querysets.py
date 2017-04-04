@@ -1,9 +1,9 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from .factories import TagFactory, BlogPostFactory
+from blog.factories import TagFactory, BlogPostFactory
 
 from django.urls import reverse
-from .models import BlogPost
+from blog.models import BlogPost
 from faker import Factory
 
 
