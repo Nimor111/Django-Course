@@ -1,45 +1,18 @@
-{% extends "website/base.html" %}
-
 <!DOCTYPE html>
 <html lang="en">
+
+{% extends "website/base.html" %}
+
 <head>
     <meta charset="UTF-8">
 
-{% block title %}
-    <title>
-    </title>
-{% endblock %}
+        {% block title %}
+            Index
+        {% endblock title %}
 </head>
-{% block body %}
-<body>
+    {% block body %}
     <div class='container'>
-        <div class='row'>
-            <h1><center>Offers</center></h1>
-        </div>
-        <div class='row'>
-            <div class='col-sm-3'></div>
-            <div class='col-sm-2'>
-                <h4><a href="#">All offers</a></h4>
-            </div>
-            <div class='col-sm-2'>
-                <h4><a href="{% url 'offer:offer-create' %}">Add offer</a></h4>
-            </div>
-            <div class='col-sm-2'>
-                <h4><a href="#">Statistics</a></h4>
-            </div>
-            <div class='col-sm-3'></div>
-        </div>
-        <div class='row'>
-            <div class='col-sm-5'></div>
-            <div class='col-sm-1'>
-                <h4><a href="#">Login</a></h4>
-            </div>
-            <div class='col-sm-1'>
-                <h4><a href="#">Register</a></h4>
-            </div>
-            <div class='col-sm-5'></div>
-        </div>
-        {% for offer in offers %}
+       {% for offer in offers %}
             <div class='row'>
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -64,6 +37,5 @@
             </div>
         {% endfor %}
     </div>
-</body>
-{% endblock %}
+    {% endblock %}
 </html>
