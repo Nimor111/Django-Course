@@ -1,0 +1,23 @@
+{% extends 'website/base.html' %}
+
+{% block title %}
+    Login
+{% endblock title %}
+
+{% block body %}
+<center>
+    <div class="container">
+        <div class="row">
+            <h1>Login: </h1>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                    <br>
+                    <button class="btn btn-primary" type="submit">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</center>
+{% endblock body %}

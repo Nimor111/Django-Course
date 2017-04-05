@@ -1,28 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'website/base.html' %}
+{% block title %}
+Category {{ category.pk }}
+{% endblock title %}
 
-{% extends "website/base.html" %}
-
-<head>
-    <meta charset="UTF-8">
-
-        {% block title %}
-            Index
-        {% endblock title %}
-</head>
-    {% block body %}
+{% block body %}
     <div class='container'>
-        <div class='row pull-right'>
-             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Search category
-                <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    {% for category in categories %}
-                    <li><a href="{% url 'offer:category' category.pk %}">{{ category.name }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div> 
-        </div>
+    {% if offers %}
        {% for offer in offers %}
             <div class='row'>
                 <div class="panel panel-default">
@@ -47,6 +30,8 @@
                 </div>
             </div>
         {% endfor %}
+    {% else %}
+        <h2>No offers for now!</h2>
+    {% endif %}
     </div>
-    {% endblock body %}
-</html>
+{% endblock body %} 
