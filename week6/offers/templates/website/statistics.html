@@ -1,0 +1,30 @@
+{% extends 'website/base.html' %}
+
+{% block title %}
+Statistics
+{% endblock title %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Category</th>
+                        <th>Number of offers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in cat_stats %}
+                        <tr>
+                        {% for key, value in d.items %}
+                                <th>{{ value }}</th>
+                        {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock body %}

@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, F
 
 from .models import Offer, Category
 from .forms import OfferModelForm
@@ -13,13 +15,17 @@ def index_view(request):
     return render(request, 'website/index.html', locals())
 
 
+@login_required(login_url=reverse_lazy('login'))
 def offer_create_view(request):
     form = OfferModelForm()
 
     if request.method == 'POST':
         form = OfferModelForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            offer = form.save()
+            # import ipdb; ipdb.set_trace()
+            offer.author = request.user
+            offer.save()
             return redirect(reverse_lazy('offer:index'))
 
     return render(request, 'website/add_offer.html', locals())
@@ -45,3 +51,10 @@ def register_view(request):
         else:
             return redirect('/register/')
     return render(request, 'website/register.html', locals())
+
+
+def statistics_view(request):
+    cat_stats = list(Offer.objects.values('category').annotate(name=F('category__name'), ccount=Count('category')).
+                     order_by('-ccount'))
+
+    return render(request, 'website/statistics.html', locals())
