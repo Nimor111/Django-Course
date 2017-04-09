@@ -1,4 +1,7 @@
 import factory
+
+from django.contrib.auth.models import User
+
 from moneyed import Money, EUR
 from djmoney.models.fields import MoneyField
 from .models import Category, Offer
@@ -25,3 +28,11 @@ class OfferFactory(factory.django.DjangoModelFactory):
     created_at = faker.date_time()
     category = factory.SubFactory(CategoryFactory)
     image = factory.django.ImageField(color='blue')
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    username = factory.LazyAttribute(lambda _: faker.name())
+    password = 'Ivoepanda'

@@ -2,33 +2,42 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, F
+
+from django.views import generic
 
 from .models import Offer, Category
 from .forms import OfferModelForm
 
-
-def index_view(request):
-    offers = Offer.objects.select_related('category', 'author').all()
-    categories = Category.objects.all()
-
-    return render(request, 'website/index.html', locals())
+from moneyed import Money, EUR
 
 
-@login_required(login_url=reverse_lazy('login'))
-def offer_create_view(request):
-    form = OfferModelForm()
+class OfferListView(generic.ListView):
+    model = Offer
+    context_object_name = 'offers'
+    template_name = 'website/index.html'
 
-    if request.method == 'POST':
-        form = OfferModelForm(request.POST, request.FILES)
-        if form.is_valid():
-            offer = form.save()
-            # import ipdb; ipdb.set_trace()
-            offer.author = request.user
-            offer.save()
-            return redirect(reverse_lazy('offer:index'))
+    def get_queryset(self):
+        return Offer.objects.select_related('category', 'author').all()
 
-    return render(request, 'website/add_offer.html', locals())
+
+class OfferCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Offer
+    template_name = 'website/add_offer.html'
+    login_url = reverse_lazy('login')
+    form_class = OfferModelForm
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+
+        return super(OfferCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('offer:index')
+
+    def get_initial(self):
+        return {'price': Money(100, EUR)}
 
 
 def offer_category_view(request, pk):
@@ -55,6 +64,6 @@ def register_view(request):
 
 def statistics_view(request):
     cat_stats = list(Offer.objects.values('category').annotate(name=F('category__name'), ccount=Count('category')).
-                     order_by('-ccount'))
+                     order_by('-ccount'))[:3]
 
     return render(request, 'website/statistics.html', locals())
