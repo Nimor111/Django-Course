@@ -74,3 +74,51 @@ class OfferCreateViewTests(TestCase):
 
     def tearDown(self):
         self.client.logout()
+
+
+class OffersByCategoryViewTests(TestCase):
+
+    def setUp(self):
+        self.category = CategoryFactory()
+        self.client = Client()
+        self.user = UserFactory()
+        self.url = reverse('offer:category', kwargs={'pk': self.category.pk})
+
+    def test_for_zero_offers_in_a_category(self):
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'No offers for now!')
+
+    def test_for_offers_in_category(self):
+        offer = OfferFactory(category=self.category)
+        offer2 = OfferFactory(category=self.category)
+        self.assertEqual(2, Offer.objects.count())
+
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, offer.title)
+        self.assertContains(response, offer2.title)
+
+
+class StatisticViewTests(TestCase):
+
+    def setUp(self):
+        self.category = CategoryFactory()
+        self.client = Client()
+        self.url = reverse('offer:statistics')
+
+    def test_number_of_offers_for_category_is_correct_when_not_zero(self):
+        offer = OfferFactory(category=self.category)
+        offer2 = OfferFactory(category=self.category)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, '{}'.format(self.category.name))
+        self.assertContains(response, '2')
+
+    def test_number_of_offers_for_cat_is_0_when_no_offers(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, '{}'.format(self.category.name))

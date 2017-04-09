@@ -21,6 +21,13 @@ class OfferListView(generic.ListView):
     def get_queryset(self):
         return Offer.objects.select_related('category', 'author').all()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['categories'] = Category.objects.all()
+
+        return context
+
 
 class OfferCreateView(LoginRequiredMixin, generic.CreateView):
     model = Offer
@@ -40,11 +47,14 @@ class OfferCreateView(LoginRequiredMixin, generic.CreateView):
         return {'price': Money(100, EUR)}
 
 
-def offer_category_view(request, pk):
-    category = get_object_or_404(Category, pk=pk)
-    offers = Offer.objects.filter(category=category)
+class OfferCategoryListView(generic.ListView):
+    model = Offer
+    template_name = 'website/offers_by_category.html'
+    context_object_name = 'offers'
 
-    return render(request, 'website/offers_by_category.html', locals())
+    def get_queryset(self):
+        category = get_object_or_404(Category, pk=self.kwargs['pk'])
+        return Offer.objects.filter(category=category)
 
 
 def register_view(request):
@@ -62,8 +72,12 @@ def register_view(request):
     return render(request, 'website/register.html', locals())
 
 
-def statistics_view(request):
-    cat_stats = list(Offer.objects.values('category').annotate(name=F('category__name'), ccount=Count('category')).
-                     order_by('-ccount'))[:3]
+class StatisticsView(generic.TemplateView):
+    template_name = 'website/statistics.html'
 
-    return render(request, 'website/statistics.html', locals())
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['cat_stats'] = list(Offer.objects.values('category').annotate(name=F('category__name'), ccount=Count('category')).order_by('-ccount'))[:3]
+
+        return context
