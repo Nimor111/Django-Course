@@ -34,7 +34,7 @@
                             <h3> No image to display </h3>
                             {% endif %}
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-5">
                             <ul>
                                 <li>{{ offer.title }} - {{ offer.price }}</li>
                                 <li>Description: {{ offer.description }}</li>
@@ -42,6 +42,9 @@
                                 <li>Category: {{ offer.category.name }}</li>
                                 <li>From: {{ offer.created_at }}</li>
                             </ul>
+                        </div>
+                        <div class="col-sm-3">
+                            <a href="{% url 'offer:offer-detail' offer.pk %}"><button type="button" class="btn btn-info">Details</button></a>
                         </div>
                     </div>
                 </div>

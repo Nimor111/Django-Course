@@ -57,6 +57,27 @@ class OfferCategoryListView(generic.ListView):
         return Offer.objects.filter(category=category)
 
 
+class StatisticsView(generic.TemplateView):
+    template_name = 'website/statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['cat_stats'] = list(Offer.objects.values('category').annotate(name=F('category__name'), ccount=Count('category')).order_by('-ccount'))[:3]
+
+        return context
+
+
+class OfferDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Offer
+    login_url = reverse_lazy('login')
+    template_name = 'website/offer-detail.html'
+    context_object_name = 'offer'
+
+    def get_object(self):
+        return get_object_or_404(Offer, pk=self.kwargs['pk'])
+
+
 def register_view(request):
     form = UserCreationForm()
     if request.method == 'POST':
@@ -70,14 +91,3 @@ def register_view(request):
         else:
             return redirect('/register/')
     return render(request, 'website/register.html', locals())
-
-
-class StatisticsView(generic.TemplateView):
-    template_name = 'website/statistics.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context['cat_stats'] = list(Offer.objects.values('category').annotate(name=F('category__name'), ccount=Count('category')).order_by('-ccount'))[:3]
-
-        return context
