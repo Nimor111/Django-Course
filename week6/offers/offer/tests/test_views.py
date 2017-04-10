@@ -19,13 +19,14 @@ class IndexViewTests(TestCase):
     def setUp(self):
         self.offer = OfferFactory()
         self.client = Client()
+        self.url = reverse('offer:index')
 
     def test_get(self):
-        response = self.client.get(reverse('offer:index'))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_if_an_offer_is_displayed_correctly(self):
-        response = self.client.get(reverse('offer:index'))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.offer.title)
         self.assertNotContains(response, 'No image to display')
@@ -141,19 +142,16 @@ class OfferDetailViewTests(TestCase):
         self.offer = OfferFactory(category=self.category)
         self.user = UserFactory()
         self.client = Client()
+        self.url = reverse('offer:offer-detail', kwargs={'pk': self.offer.pk})
 
     def test_offer_detail_cannot_be_accessed_if_not_logged_in(self):
-        url = reverse('offer:offer-detail', kwargs={'pk': self.offer.pk})
-
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         self.assertEqual(302, response.status_code)
 
     def test_offer_detail_can_be_accessed_if_logged(self):
         self.client.force_login(self.user)
 
-        url = reverse('offer:offer-detail', kwargs={'pk': self.offer.pk})
-
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)
         self.assertContains(response, self.offer.title)
         self.assertContains(response, self.offer.category.name)
