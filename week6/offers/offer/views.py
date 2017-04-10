@@ -47,10 +47,11 @@ class OfferCreateView(LoginRequiredMixin, generic.CreateView):
         return {'price': Money(100, EUR)}
 
 
-class OfferCategoryListView(generic.ListView):
+class OfferCategoryListView(LoginRequiredMixin, generic.ListView):
     model = Offer
     template_name = 'website/offers_by_category.html'
     context_object_name = 'offers'
+    login_url = reverse_lazy('login')
 
     def get_queryset(self):
         category = get_object_or_404(Category, pk=self.kwargs['pk'])
@@ -71,11 +72,46 @@ class StatisticsView(generic.TemplateView):
 class OfferDetailView(LoginRequiredMixin, generic.DetailView):
     model = Offer
     login_url = reverse_lazy('login')
-    template_name = 'website/offer-detail.html'
+    template_name = 'website/offer_detail.html'
     context_object_name = 'offer'
 
     def get_object(self):
         return get_object_or_404(Offer, pk=self.kwargs['pk'])
+
+
+class OfferUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Offer
+    login_url = reverse_lazy('login')
+    template_name = 'website/add_offer.html'
+    form_class = OfferModelForm
+
+    def save():
+        import ipdb; ipdb.set_trace()
+        return super().save()
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+
+        return super(OfferUpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('offer:index')
+
+    def dispatch(self, request, *args, **kwargs):
+        offer = get_object_or_404(Offer, pk=self.kwargs['pk'])
+
+        if offer.author != request.user:
+            return redirect('offer:index')
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class OfferDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Offer
+    login_url = reverse_lazy('login')
+
+    def get_success_url(self):
+        return reverse_lazy('offer:index')
 
 
 def register_view(request):

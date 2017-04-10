@@ -37,14 +37,20 @@
                         <div class="col-sm-5">
                             <ul>
                                 <li>{{ offer.title }} - {{ offer.price }}</li>
-                                <li>Description: {{ offer.description }}</li>
                                 <li>Author: {{ offer.author.username }}</li>
                                 <li>Category: {{ offer.category.name }}</li>
                                 <li>From: {{ offer.created_at }}</li>
                             </ul>
                         </div>
                         <div class="col-sm-3">
-                            <a href="{% url 'offer:offer-detail' offer.pk %}"><button type="button" class="btn btn-info">Details</button></a>
+                            <a href="{% url 'offer:offer-detail' offer.pk %}"><button type="button" class="btn btn-info">Details</button></a><br>
+                            {% if request.user == offer.author %}
+                            <a href="{% url 'offer:offer-update' offer.pk %}"><button type="button" class="btn btn-primary">Update</button></a><br>
+                            <form method="POST" action="{% url 'offer:offer-delete' offer.pk %}" enctype="multipart/form-data"> 
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -85,11 +85,13 @@ class OffersByCategoryViewTests(TestCase):
         self.url = reverse('offer:category', kwargs={'pk': self.category.pk})
 
     def test_for_zero_offers_in_a_category(self):
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)
         self.assertContains(response, 'No offers for now!')
 
     def test_for_offers_in_category(self):
+        self.client.force_login(self.user)
         offer = OfferFactory(category=self.category)
         offer2 = OfferFactory(category=self.category)
         self.assertEqual(2, Offer.objects.count())
@@ -98,6 +100,14 @@ class OffersByCategoryViewTests(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertContains(response, offer.title)
         self.assertContains(response, offer2.title)
+
+    def test_category_offers_redirect_when_not_logged(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(302, response.status_code)
+
+    def tearDown(self):
+        self.client.logout()
 
 
 class StatisticViewTests(TestCase):
@@ -150,3 +160,62 @@ class OfferDetailViewTests(TestCase):
 
     def tearDown(self):
         self.client.logout()
+
+
+class OfferUpdateViewTests(TestCase):
+
+    def setUp(self):
+        self.category = CategoryFactory()
+        self.user = UserFactory()
+        self.offer = OfferFactory(category=self.category, author=self.user)
+        self.user2 = UserFactory()
+        self.url = reverse('offer:offer-update', kwargs={'pk': self.offer.pk})
+        self.client = Client()
+
+    def test_can_not_update_if_not_logged_in(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(302, response.status_code)
+
+    def test_can_not_update_if_not_author(self):
+        self.client.force_login(self.user2)
+        response = self.client.get(self.url)
+
+        self.assertEqual(302, response.status_code)
+
+    def test_can_update_if_author(self):
+        self.client.force_login(self.user)
+        new_title = faker.word()
+        new_desc = faker.text()
+        data = {
+            'title': new_title,
+            'description': new_desc,
+        }
+
+        response = self.client.post(self.url, data=data)
+        # import ipdb; ipdb.set_trace()
+        self.assertEqual(302, response.status_code)
+
+    def tearDown(self):
+        self.client.logout()
+
+
+class OfferDeleteViewTests(TestCase):
+
+    def setUp(self):
+        self.offer = OfferFactory()
+        self.user = UserFactory()
+        self.url = reverse('offer:offer-delete', kwargs={'pk': self.offer.pk})
+
+    def test_cannot_delete_if_not_logged(self):
+        self.assertEqual(Offer.objects.count(), 1)
+        response = self.client.post(self.url)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(Offer.objects.count(), 1)
+
+    def test_can_delete_if_logged(self):
+        self.assertEqual(Offer.objects.count(), 1)
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(Offer.objects.count(), 0)
