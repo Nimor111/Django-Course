@@ -11,7 +11,7 @@ class BaseUserPassesTestMixin(UserPassesTestMixin):
 
 class CanUpdateOfferMixin(BaseUserPassesTestMixin):
 
-    raise_exception = True
+    raise_exception = False
 
     def test_func(self):
         # import ipdb; ipdb.set_trace()

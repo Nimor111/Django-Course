@@ -82,6 +82,9 @@ class OfferDetailView(LoginRequiredMixin, generic.DetailView):
 
 class OfferUpdateView(LoginRequiredMixin, CanUpdateOfferMixin,
                       generic.UpdateView):
+
+    raise_exception = False
+    redirect_unauthenticated_users = True
     model = Offer
     login_url = reverse_lazy('login')
     template_name = 'website/add_offer.html'
@@ -128,13 +131,37 @@ class OfferAcceptStatusView(LoginRequiredMixin, IsSuperUserMixin, generic.Update
 
     def form_valid(self, form):
         form.instance = Offer.objects.get(pk=self.kwargs['pk'])
-        # import ipdb; ipdb.set_trace()
         form.instance.status = "a"
 
         return super(OfferAcceptStatusView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('offer:index')
+
+
+class OfferRejectStatusView(LoginRequiredMixin, IsSuperUserMixin, generic.UpdateView):
+    model = Offer
+    login_url = reverse_lazy('login')
+    template_name = 'website/index.html'
+    form_class = OfferModelForm
+
+    def form_valid(self, form):
+        form.instance = Offer.objects.get(pk=self.kwargs['pk'])
+        form.instance.status = "r"
+
+        return super(OfferRejectStatusView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('offer:index')
+
+
+class ApprovedAndRejectedOffersView(LoginRequiredMixin, generic.ListView):
+    model = Offer
+    template_name = 'website/index.html'
+    context_object_name = 'offers'
+
+    def get_queryset(self):
+        return Offer.objects.get_offers_for_user(self.kwargs.get('pk'))
 
 
 def register_view(request):

@@ -13,7 +13,6 @@ from django.urls import reverse
 faker = Factory.create()
 
 
-# Create your tests here.
 class IndexViewTests(TestCase):
 
     def setUp(self):
@@ -25,11 +24,23 @@ class IndexViewTests(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
-    def test_if_an_offer_is_displayed_correctly(self):
+    def test_if_an_offer_is_displayed_correctly_if_is_accepted(self):
+        Offer.objects.filter(pk=self.offer.pk).update(status='a')
+        self.offer.refresh_from_db()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.offer.title)
         self.assertNotContains(response, 'No image to display')
+
+    def test_if_an_offer_is_displayed_correctly_if_is_pending_or_rejected(self):
+        offer = OfferFactory()
+        Offer.objects.filter(pk=self.offer.pk).update(status='r')
+        self.offer.refresh_from_db()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['offers'], [])
+        self.assertNotContains(response, self.offer.title)
+        self.assertNotContains(response, offer.title)
 
 
 class OfferCreateViewTests(TestCase):
@@ -70,7 +81,6 @@ class OfferCreateViewTests(TestCase):
 
         logged = self.client.force_login(self.user)
         response = self.client.post(url, data=data)
-        # import ipdb; ipdb.set_trace()
         self.assertEqual(302, response.status_code)
         self.assertEqual(1, Offer.objects.count())
 
@@ -180,7 +190,7 @@ class OfferUpdateViewTests(TestCase):
         self.client.force_login(self.user2)
         response = self.client.get(self.url)
 
-        self.assertEqual(403, response.status_code)
+        self.assertEqual(302, response.status_code)
 
     def test_can_update_if_author(self):
         self.client.force_login(self.user)
@@ -193,7 +203,6 @@ class OfferUpdateViewTests(TestCase):
         }
 
         response = self.client.post(self.url, data=data)
-        # import ipdb; ipdb.set_trace()
         self.assertEqual(302, response.status_code)
         self.offer.refresh_from_db()
         self.assertEqual(self.offer.title, new_title)
@@ -223,26 +232,119 @@ class OfferDeleteViewTests(TestCase):
         self.assertEqual(Offer.objects.count(), 0)
 
 
+class PendingOffersViewTests(TestCase):
+
+    def setUp(self):
+        self.offer = OfferFactory()
+        self.accepted_offer = OfferFactory(status='a')
+        self.url = reverse('offer:pending')
+        self.client = Client()
+        self.superuser = UserFactory(is_superuser=True)
+        self.user = UserFactory()
+
+    def test_pending_view_displays_only_pending_offers(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.offer.title)
+        self.assertNotContains(response, self.accepted_offer.title)
+
+    def test_regular_user_can_not_access_pending_offers(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(403, response.status_code)
+
+        def tearDown(self):
+            self.client.logout()
+
+
 class OfferAcceptStatusViewTests(TestCase):
 
     def setUp(self):
         self.offer = OfferFactory()
         self.superuser = UserFactory(is_superuser=True)
         self.user = UserFactory()
-        # import ipdb; ipdb.set_trace()
         self.url = reverse('offer:offer-accept', kwargs={'pk': self.offer.pk})
         self.client = Client()
+
+    def test_can_not_accept_offer_if_not_superuser(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+
+        self.assertEqual(403, response.status_code)
 
     def test_can_accept_offer(self):
         self.client.force_login(self.superuser)
 
-        data = {
-            'title': 'stuff',
-            'description': 'other stuff',
-            'status': 'a',
-        }
-
-        response = self.client.post(self.url, data=data)
-        # import ipdb; ipdb.set_trace()
+        response = self.client.post(self.url)
         self.offer.refresh_from_db()
         self.assertEqual('a', self.offer.status)
+
+    def tearDown(self):
+        self.client.logout()
+
+
+class OfferRejectStatusViewTests(TestCase):
+
+    def setUp(self):
+        self.offer = OfferFactory()
+        self.superuser = UserFactory(is_superuser=True)
+        self.user = UserFactory()
+        self.url = reverse('offer:offer-reject', kwargs={'pk': self.offer.pk})
+        self.client = Client()
+
+    def test_can_not_reject_if_not_superuser(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_can_reject_offer_if_superuser(self):
+        self.client.force_login(self.superuser)
+
+        response = self.client.post(self.url)
+        self.offer.refresh_from_db()
+        self.assertEqual('r', self.offer.status)
+
+
+class ApprovedAndRejectedOffersViewTests(TestCase):
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.accepted_offer = OfferFactory(author=self.user, status='a')
+        self.rejected_offer = OfferFactory(author=self.user, status='r')
+        self.pending_offer = OfferFactory(author=self.user)
+        self.url = reverse('offer:user-offers', kwargs={'pk': self.user.pk})
+        self.client = Client()
+
+    def test_if_accepted_and_rejected_offers_are_shown(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.accepted_offer.title)
+        self.assertContains(response, self.rejected_offer.title)
+        self.assertNotContains(response, self.pending_offer.title)
+
+    def test_no_view_if_user_not_logged_in(self):
+        response = self.client.get(self.url)
+        self.assertEqual(302, response.status_code)
+
+    def test_if_when_accepted_offer_appears_in_authors_view(self):
+        superuser = UserFactory(is_superuser=True)
+        self.client.force_login(superuser)
+        url = reverse('offer:offer-accept', kwargs={'pk': self.pending_offer.pk})
+
+        accept_response = self.client.post(url)
+        self.pending_offer.refresh_from_db()
+        self.assertEqual(302, accept_response.status_code)
+        self.assertEqual('a', self.pending_offer.status)
+
+        self.client.logout()
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, self.pending_offer.title)
+
+    def tearDown(self):
+        self.client.logout()

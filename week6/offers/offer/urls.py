@@ -12,4 +12,6 @@ urlpatterns = [
     url(r'^delete/(?P<pk>[0-9]+)', views.OfferDeleteView.as_view(), name='offer-delete'),
     url(r'^pending/$', views.PendingOffersView.as_view(), name='pending'),
     url(r'^accept/(?P<pk>[0-9]+)', views.OfferAcceptStatusView.as_view(), name='offer-accept'),
+    url(r'^user/(?P<pk>[0-9]+)', views.ApprovedAndRejectedOffersView.as_view(), name='user-offers'),
+    url(r'^reject/(?P<pk>[0-9]+)', views.OfferRejectStatusView.as_view(), name='offer-reject')
 ]
