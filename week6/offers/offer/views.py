@@ -163,6 +163,13 @@ class ApprovedAndRejectedOffersView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         return Offer.objects.get_offers_for_user(self.kwargs.get('pk'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['categories'] = Category.objects.all()
+
+        return context
+
 
 def register_view(request):
     form = UserCreationForm()

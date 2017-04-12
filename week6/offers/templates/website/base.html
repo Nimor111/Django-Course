@@ -46,10 +46,17 @@
             </div>
             {% else %}
             <div class ='col-sm-2'>
-                <h4><a href="{% url 'logout' %}">Logout</a></h4>
+                <h4><a href="{% url 'logout' %}">{{ user.username }} (Logout)</a></h4>
+            </div>
+            <div class='col-sm-2'>
+                <h4><a href="{% url 'offer:user-offers' user.pk %}">Your offers</a></h4>
             </div>
             {% endif %}
-            <div class='col-sm-5'></div>
+            <div class='col-sm-3'>
+                {% if user.is_superuser %}
+                    <h4><a href="{% url 'offer:pending' %}">Pending offers</a></h4>
+                {% endif %}
+            </div>
         </div>
    </div>
 {% block body %}
