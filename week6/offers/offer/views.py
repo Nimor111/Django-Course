@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, F
 
 from django.views import generic
 
 from .models import Offer, Category
 from .forms import OfferModelForm
+from .mixins import CanUpdateOfferMixin, IsSuperUserMixin
 
 from moneyed import Money, EUR
 
@@ -19,7 +20,7 @@ class OfferListView(generic.ListView):
     template_name = 'website/index.html'
 
     def get_queryset(self):
-        return Offer.objects.select_related('category', 'author').all()
+        return Offer.objects.get_accepted_offers()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,15 +80,12 @@ class OfferDetailView(LoginRequiredMixin, generic.DetailView):
         return get_object_or_404(Offer, pk=self.kwargs['pk'])
 
 
-class OfferUpdateView(LoginRequiredMixin, generic.UpdateView):
+class OfferUpdateView(LoginRequiredMixin, CanUpdateOfferMixin,
+                      generic.UpdateView):
     model = Offer
     login_url = reverse_lazy('login')
     template_name = 'website/add_offer.html'
     form_class = OfferModelForm
-
-    def save():
-        import ipdb; ipdb.set_trace()
-        return super().save()
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -97,18 +95,43 @@ class OfferUpdateView(LoginRequiredMixin, generic.UpdateView):
     def get_success_url(self):
         return reverse_lazy('offer:index')
 
-    def dispatch(self, request, *args, **kwargs):
-        offer = get_object_or_404(Offer, pk=self.kwargs['pk'])
-
-        if offer.author != request.user:
-            return redirect('offer:index')
-
-        return super().dispatch(request, *args, **kwargs)
-
 
 class OfferDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Offer
     login_url = reverse_lazy('login')
+
+    def get_success_url(self):
+        return reverse_lazy('offer:index')
+
+
+class PendingOffersView(LoginRequiredMixin, IsSuperUserMixin, generic.ListView):
+    model = Offer
+    template_name = 'website/index.html'
+    context_object_name = 'offers'
+
+    def get_queryset(self):
+        return Offer.objects.get_pending_offers()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['pending'] = True
+
+        return context
+
+
+class OfferAcceptStatusView(LoginRequiredMixin, IsSuperUserMixin, generic.UpdateView):
+    model = Offer
+    login_url = reverse_lazy('login')
+    template_name = 'website/index.html'
+    form_class = OfferModelForm
+
+    def form_valid(self, form):
+        form.instance = Offer.objects.get(pk=self.kwargs['pk'])
+        # import ipdb; ipdb.set_trace()
+        form.instance.status = "a"
+
+        return super(OfferAcceptStatusView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('offer:index')

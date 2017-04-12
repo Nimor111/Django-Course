@@ -10,7 +10,11 @@ class OfferModelForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['price'].required = False
+        self.fields['title'].required = False
+        self.fields['description'].required = False
+        self.fields['status'].required = False
 
     class Meta:
         model = Offer
-        fields = ('title', 'price', 'description', 'image', 'category')
+        fields = ('title', 'price', 'status', 'description', 'image', 'category')
+        widgets = {'status': forms.HiddenInput()}

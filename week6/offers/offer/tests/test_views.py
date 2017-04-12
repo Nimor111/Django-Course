@@ -63,6 +63,7 @@ class OfferCreateViewTests(TestCase):
             'description': faker.text(),
             'image': tmp_file,
             'category': self.category.id,
+            'status': 'p',
         }
 
         url = reverse('offer:offer-create')
@@ -179,7 +180,7 @@ class OfferUpdateViewTests(TestCase):
         self.client.force_login(self.user2)
         response = self.client.get(self.url)
 
-        self.assertEqual(302, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     def test_can_update_if_author(self):
         self.client.force_login(self.user)
@@ -188,11 +189,14 @@ class OfferUpdateViewTests(TestCase):
         data = {
             'title': new_title,
             'description': new_desc,
+            'status': 'p',
         }
 
         response = self.client.post(self.url, data=data)
         # import ipdb; ipdb.set_trace()
         self.assertEqual(302, response.status_code)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.title, new_title)
 
     def tearDown(self):
         self.client.logout()
@@ -217,3 +221,28 @@ class OfferDeleteViewTests(TestCase):
         response = self.client.post(self.url)
         self.assertEqual(302, response.status_code)
         self.assertEqual(Offer.objects.count(), 0)
+
+
+class OfferAcceptStatusViewTests(TestCase):
+
+    def setUp(self):
+        self.offer = OfferFactory()
+        self.superuser = UserFactory(is_superuser=True)
+        self.user = UserFactory()
+        # import ipdb; ipdb.set_trace()
+        self.url = reverse('offer:offer-accept', kwargs={'pk': self.offer.pk})
+        self.client = Client()
+
+    def test_can_accept_offer(self):
+        self.client.force_login(self.superuser)
+
+        data = {
+            'title': 'stuff',
+            'description': 'other stuff',
+            'status': 'a',
+        }
+
+        response = self.client.post(self.url, data=data)
+        # import ipdb; ipdb.set_trace()
+        self.offer.refresh_from_db()
+        self.assertEqual('a', self.offer.status)

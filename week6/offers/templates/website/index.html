@@ -40,6 +40,7 @@
                                 <li>Author: {{ offer.author.username }}</li>
                                 <li>Category: {{ offer.category.name }}</li>
                                 <li>From: {{ offer.created_at }}</li>
+                                <li>Status: {{ offer.status }}</li>
                             </ul>
                         </div>
                         <div class="col-sm-3">
@@ -49,6 +50,12 @@
                             <form method="POST" action="{% url 'offer:offer-delete' offer.pk %}" enctype="multipart/form-data"> 
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                            {% endif %}
+                            {% if pending %}
+                            <form method="POST" action="{% url 'offer:offer-accept' offer.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="submit-btn btn btn-primary">Accept</button>
                             </form>
                             {% endif %}
                         </div>
