@@ -7,6 +7,8 @@ import django.contrib.auth.views as auth_views
 
 from offer.views import register_view
 
+from rest_framework_jwt.views import obtain_jwt_token
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login/$', auth_views.login, {'template_name': 'website/login.html'},
@@ -14,6 +16,7 @@ urlpatterns = [
     url(r'logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'register/$', register_view, name='register'),
     url(r'^', include('offer.urls', namespace='offer')),
+    url(r'^api-token-auth/', obtain_jwt_token),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
