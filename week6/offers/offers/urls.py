@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'register/$', register_view, name='register'),
     url(r'^', include('offer.urls', namespace='offer')),
-    url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^api-token-auth/', obtain_jwt_token, name='obtain-token'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
