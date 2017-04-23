@@ -15,5 +15,7 @@ urlpatterns = [
     url(r'^user/(?P<pk>[0-9]+)', views.ApprovedAndRejectedOffersView.as_view(), name='user-offers'),
     url(r'^reject/(?P<pk>[0-9]+)', views.OfferRejectStatusView.as_view(), name='offer-reject'),
     url(r'^api/offers/$', views.OfferList.as_view()),
-    url(r'^api/offers/(?P<pk>[0-9]+)', views.OfferDetail.as_view())
+    url(r'^api/offers/(?P<pk>[0-9]+)', views.OfferDetail.as_view()),
+    url(r'^api/categories/$', views.CategoryList.as_view()),
+    url(r'^api/categories/(?P<pk>[0-9]+)/$', views.CategoryDetail.as_view())
 ]

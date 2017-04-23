@@ -2,6 +2,9 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from offer.models import Offer
 
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 class BaseUserPassesTestMixin(UserPassesTestMixin):
 
@@ -32,3 +35,8 @@ class IsSuperUserMixin(BaseUserPassesTestMixin):
             return False
 
         return True and super().test_func()
+
+
+class JWTAuthenticationMixin():
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (JSONWebTokenAuthentication, )

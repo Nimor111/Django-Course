@@ -9,14 +9,12 @@ from django.views import generic
 
 from .models import Offer, Category
 from .forms import OfferModelForm
-from .mixins import CanUpdateOfferMixin, IsSuperUserMixin
+from .mixins import CanUpdateOfferMixin, IsSuperUserMixin, JWTAuthenticationMixin
 from .serializers import OfferSerializer, CategorySerializer
 
 from moneyed import Money, EUR
 
 from rest_framework import generics
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 
 class OfferListView(generic.ListView):
@@ -176,17 +174,24 @@ class ApprovedAndRejectedOffersView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class OfferList(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated, )
-    authentication_classes = (JSONWebTokenAuthentication, )
-
+class OfferList(JWTAuthenticationMixin, generics.ListCreateAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
 
 
-class OfferDetail(generics.RetrieveUpdateDestroyAPIView):
+class OfferDetail(JWTAuthenticationMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
+
+
+class CategoryList(JWTAuthenticationMixin, generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class CategoryDetail(JWTAuthenticationMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 def register_view(request):
