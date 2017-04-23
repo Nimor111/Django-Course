@@ -147,3 +147,6 @@ class CategoryAPITests(APITestCase):
         response = self.client.post(reverse_lazy('offer:category-list-api'), data=data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Category.objects.count(), 2)
+
+    def tearDown(self):
+        self.client.logout()
