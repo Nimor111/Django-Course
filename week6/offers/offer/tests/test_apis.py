@@ -95,4 +95,55 @@ class OfferAPITests(APITestCase):
 
 
 class CategoryAPITests(APITestCase):
-    pass
+
+    def setUp(self):
+        self.category = CategoryFactory()
+        self.user = UserFactory()
+        self.client = APIClient()
+
+    def test_can_access_category_if_authenticated(self):
+        self.client.force_login(self.user)
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(reverse_lazy('offer:category-list-api'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.category.name)
+
+    def test_can_access_specific_category_if_authenticated(self):
+        self.client.force_login(self.user)
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(reverse_lazy('offer:category-detail-api', kwargs={'pk': self.category.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.category.name)
+
+    def test_can_edit_specific_category_if_authenticated(self):
+        self.client.force_login(self.user)
+        self.client.force_authenticate(user=self.user)
+        name = "New name"
+
+        response = self.client.put(reverse_lazy('offer:category-detail-api',
+                                   kwargs={'pk': self.category.pk}),
+                                   data={'name': name})
+        self.category.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.category.name, name)
+
+    def test_can_delete_category_if_authenticated(self):
+        self.assertEqual(Category.objects.count(), 1)
+        self.client.force_login(self.user)
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.delete(reverse_lazy('offer:category-detail-api', kwargs={'pk': self.category.pk}))
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Category.objects.count(), 0)
+
+    def test_can_post_category_if_authenticated(self):
+        self.assertEqual(Category.objects.count(), 1)
+        self.client.force_login(self.user)
+        self.client.force_authenticate(user=self.user)
+        data = {'name': 'New'}
+
+        response = self.client.post(reverse_lazy('offer:category-list-api'), data=data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Category.objects.count(), 2)
