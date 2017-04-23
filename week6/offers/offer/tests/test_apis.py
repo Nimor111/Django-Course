@@ -2,7 +2,7 @@ from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from offer.factories import OfferFactory, CategoryFactory, UserFactory
-from offer.models import Offer
+from offer.models import Offer, Category
 
 from django.urls import reverse_lazy
 from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
@@ -89,3 +89,10 @@ class OfferAPITests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.offer.title)
         self.assertContains(response, self.other_offer.title)
+
+    def tearDown(self):
+        self.client.logout()
+
+
+class CategoryAPITests(APITestCase):
+    pass
