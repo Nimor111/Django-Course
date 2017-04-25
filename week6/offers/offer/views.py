@@ -179,7 +179,7 @@ class OfferList(JWTAuthenticationMixin, generics.ListCreateAPIView):
     serializer_class = OfferSerializer
 
 
-class OfferDetail(JWTAuthenticationMixin, generics.RetrieveUpdateDestroyAPIView):
+class OfferDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
 
