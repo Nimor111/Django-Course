@@ -25,7 +25,6 @@ def make_pdf(url, filename):
     pdfkit.from_url(url, '{}.pdf'.format(filename))
 
 
-@app.task
 def search_file(uuid):
     return s.query(PDF).filter(PDF.uuid==uuid).one()
 
