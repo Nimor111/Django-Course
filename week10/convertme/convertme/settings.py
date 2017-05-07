@@ -5,10 +5,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fjr8jrt=-y=l#mz2r03e#wmpj9h9qm80vykszcqjxqnawebwa6'
+SECRET_KEY = 'yg7y#e$*dq78-fhyiydjo-@+)3=s9*d#*_0e0qr1+l^+&&i=b0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -25,11 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'djmoney',
-    'debug_toolbar',
-    'offer.apps.OfferConfig',
-    'website.apps.WebsiteConfig',
+    'django_celery_results',
+    'music',
 ]
 
 MIDDLEWARE = [
@@ -40,21 +37,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ROOT_URLCONF = 'offers.urls'
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     ),
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-#         'rest_framework.authentication.SessionAuthentication',
-#         'rest_framework.authentication.BasicAuthentication',
-#     ),
-# }
+ROOT_URLCONF = 'convertme.urls'
 
 TEMPLATES = [
     {
@@ -72,28 +57,30 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'offers.wsgi.application'
+WSGI_APPLICATION = 'convertme.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'offers',
+        'NAME': 'convertme',
         'USER': 'offeruser',
         'PASSWORD': 'offerpass',
         'HOST': 'localhost',
         'TEST': {
-            'NAME': 'test_offers',
+            'NAME': 'test_convertme',
             'USER': 'offeruser',
         },
         'PORT': '',
     }
 }
+
+
 # Password validation
-# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -112,7 +99,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.10/topics/i18n/
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -126,13 +113,14 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+
+BROKER_URL = 'amqp://localhost'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# INTERNAL_IPS = ['127.0.0.1', 'localhost']
+MEDIA_URL = '/media/'
 
-LOGIN_REDIRECT_URL = '/'
+CELERY_RESULT_BACKEND = 'django-db'

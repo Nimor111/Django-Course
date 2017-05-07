@@ -174,12 +174,12 @@ class ApprovedAndRejectedOffersView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class OfferList(JWTAuthenticationMixin, generics.ListCreateAPIView):
+class OfferList(generics.ListCreateAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
 
 
-class OfferDetail(JWTAuthenticationMixin, generics.RetrieveUpdateDestroyAPIView):
+class OfferDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
 
