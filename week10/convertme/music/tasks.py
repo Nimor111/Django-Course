@@ -20,7 +20,7 @@ import os
 def download_url(url):
     yt = YouTube(url)
     yt.set_filename(yt.filename.split()[0])
-    video = yt.get('mp4', '720p')
+    video = yt.get('mp4', '360p')
     video.download(settings.MEDIA_ROOT)
     return 'media/{}'.format(yt.filename)
 
